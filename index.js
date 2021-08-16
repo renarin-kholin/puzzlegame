@@ -18,7 +18,7 @@ let currentMsg = [];
 for (let i = 1; i < 17; i++) {
   currentMsg.push(`${i}`)
 }
-// currentMsg = shuffle(currentMsg);
+currentMsg = shuffle(currentMsg);
 
 
 io.on('connection', (socket) => {
