@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>repl.it</title>
+	<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+	<link href="style.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+	<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js">
+
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js">
+	</script>
+	<div style="position: absolute; left: 50%; top:25%;" class="hidden" id="winModal">
+		<div class="h-64 px-10 py-2 bg-white rounded-md flex flex-col shadow-lg" style="position: relative; left: -50%;">
+			<div class="mx-auto my-auto w-full">
+				<p class="mx-auto text-gray-400 text-lg">Congrats! You won</p>
+				<p class="text-gray-300 mx-auto">Click anywhere to continue</p>
+			</div>
+		</div>
+	</div>
+	<div class="h-screen w-full flex flex-col">
+		<div class="flex flex-row mx-auto my-2">
+			<input type="password" placeholder="password" id="password" class="m-2 border rounded-md px-4 outline-none focus:ring-1 ring-purple-400">
+      	<button class="px-4 py-2 bg-purple-500 text-white m-2 w-26  h-10 rounded-md hover:bg-purple-600 transition-all" onclick="emitShuffle();">Shuffle</button>
+    </div>
+    <ul class="grid grid-flow-row grid-cols-4 grid-rows-4   mx-auto my-auto" id="dragList" style="width:53rem;height:53rem;">
+		<li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="1">
+			<img src="./static/images/image_part_001.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="2">
+			<img src="./static/images/image_part_002.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="3">
+			<img src="./static/images/image_part_003.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="4">
+			<img src="./static/images/image_part_004.jpg" alt="">
+		</li>
+		
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="5">
+			<img src="./static/images/image_part_005.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="6">
+			<img src="./static/images/image_part_006.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="7">
+			<img src="./static/images/image_part_007.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="8">
+			<img src="./static/images/image_part_008.jpg" alt="">
+		</li>
+		
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="9">
+			<img src="./static/images/image_part_009.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="10">
+			<img src="./static/images/image_part_010.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="11">
+			<img src="./static/images/image_part_011.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="12">
+			<img src="./static/images/image_part_012.jpg" alt="">
+		</li>
+		
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="13">
+			<img src="./static/images/image_part_013.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="14">
+			<img src="./static/images/image_part_014.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="15">
+			<img src="./static/images/image_part_015.jpg" alt="">
+		</li>
+    <li class="h-52 w-52 shadow-md rounded-md flex flex-wrap bg-gray-50 m-1" data-id="16">
+			<img src="./static/images/image_part_016.jpg" alt="">
+		</li>
+		
+    
+	</ul>
+  </div>
+	
+	<script src="/socket.io/socket.io.js">
+
+	</script>
+	<script>
+		var socket = io();
+    socket.on("update", function(msg){
+        console.log(msg)
+        if(msg != sortable.toArray()){
+          sortable.sort(msg, true);
+        }
+         // apply
+      })
+    socket.on("win", function(msg){
+      let winModal = document.getElementById("winModal")
+      winModal.classList.remove("hidden");
+      
+      
+      completed = true;
+    })
+	</script>
+	<script>
+		// Simple list
+      var completed = false;
+      var sortable = Sortable.create(dragList, { 
+        multiDrag: true,
+        animation: 250,
+        onChange: function(/**Event*/evt) {
+          console.log(evt)
+          emitOrderChange()
+        
+          
+        }
+      });
+      function emitOrderChange(){
+        var order = sortable.toArray();
+        console.log(order)
+        socket.emit("update", order);
+      }
+      function emitShuffle(){
+        let password = document.getElementById("password").value;
+        socket.emit("shuffle", password);
+        completed = false;
+      }
+      document.body.addEventListener("click", function(e) {
+        let winModal = document.getElementById("winModal")
+      winModal.classList.add("hidden");
+        if(completed){
+          e.preventDefault();
+          party.confetti(e);
+        }
+       
+      });
+	</script>
+	<script src="script.js">
+
+	</script>
+</body>
+
+</html>
